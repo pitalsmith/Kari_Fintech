@@ -4,7 +4,7 @@ import { Text, View, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import ProfileScreen from './components/ProfileScreen';
+import ProfileScreen from './src/shared/components/ProfileScreen';
 
 const Stack = createStackNavigator();
 
