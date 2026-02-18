@@ -1,15 +1,19 @@
 import React from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer,createNavigationContainerRef, } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ProfileScreen from './src/shared/components/ProfileScreen';
 import MainApp_HomeScreen from './src/apps/KariMain/screens/home';
+import SplashScreen from './src/apps/KariMain/screens/splashscreen';
+import OnboardingScreen from './src/apps/KariMain/screens/onboardingscreen';
 
 type RootStackParamList = {
   Home: undefined;
   Profile: undefined;
   Main: undefined;
+  SplashScreen: undefined;
+  OnboardingScreen: undefined;
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
@@ -30,7 +34,7 @@ function HomeScreen({ navigation }: HomeScreenProps) {
       <TouchableOpacity 
         style={styles.button}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('Main')}
+        onPress={() => navigation.navigate('SplashScreen')}
       >
         <Text style={styles.buttonText}>Go to Main App Home</Text>
       </TouchableOpacity>
@@ -39,15 +43,18 @@ function HomeScreen({ navigation }: HomeScreenProps) {
 }
 
 // --- MAIN APP ---
+export const rootNavigationRef = createNavigationContainerRef();
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer >
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Main" component={MainApp_HomeScreen} />
+          <Stack.Screen name="SplashScreen" component={SplashScreen} /> 
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

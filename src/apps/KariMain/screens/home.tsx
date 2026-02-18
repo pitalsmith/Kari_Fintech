@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   ScrollView,
   Image,
-  TouchableOpacity,
+  TouchableOpacity, RefreshControl,ActivityIndicator, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { rootNavigationRef } from '../../../../App';
+
+import ProfileScreen from 'ProfileScreen';
 
 /* ---------- NAVIGATORS ---------- */
 const Drawer = createDrawerNavigator();
@@ -54,12 +57,46 @@ function AppHeader({ navigation }: any) {
 }
 
 /* ---------- HOME SCREEN ---------- */
-function HomeScreen() {
+function HomeScreen({ navigation }: any) {
+    const [refreshing, setRefreshing] = useState(false);
+     const [loading, setLoading] = useState(false);
+
+       const handleTransferPress = () => {
+    setLoading(true);
+
+    // Simulate a 2-second loading delay
+    setTimeout(() => {
+      setLoading(false);
+      navigation.getParent()?.navigate("Profile"); // Replace with your actual screen name
+    }, 2000);
+  };
+    
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    // Simulate fetching data or refresh logic
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500); // 1.5 seconds
+  }, []);
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingHorizontal: 20 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh}
+         />
+      }
     >
+            <Modal transparent visible={loading}>
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#FFCC00" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </Modal>
+
+      
       <View style={styles.welcomeRow}>
         <View>
           <Text style={styles.greetingText}>Hi Ogoluwa,</Text>
@@ -68,8 +105,10 @@ function HomeScreen() {
         <Text style={styles.balanceText}>₦15,903</Text>
       </View>
 
+
+        
       <View style={styles.actionCard}>
-        <TouchableOpacity style={styles.actionItem}>
+        <TouchableOpacity style={styles.actionItem} onPress={handleTransferPress}>
           <MaterialCommunityIcons name="swap-horizontal" size={24} />
           <Text style={styles.actionLabel}>Transfer</Text>
         </TouchableOpacity>
@@ -117,15 +156,37 @@ function MainTabs() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: 'black',
         tabBarInactiveTintColor: COLORS.textGray,
-        tabBarStyle: { height: 70 },
-        tabBarIcon: ({ color }) => {
+        tabBarStyle: { height: 75, paddingTop: 15 ,backgroundColor: COLORS.white,
+          borderTopWidth: 0,},
+        tabBarIcon: ({ color, focused }) => {
           let iconName: any;
           if (route.name === 'Home') iconName = 'home';
           if (route.name === 'Wallet') iconName = 'wallet-outline';
           if (route.name === 'Location') iconName = 'location-outline';
           if (route.name === 'Cart') iconName = 'cart-outline';
           if (route.name === 'Notifications') iconName = 'notifications-outline';
-          return <Ionicons name={iconName} size={24} color={color} />;
+          return (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              {focused ? (
+                // Active tab: icon inside a circle
+                <View
+                  style={{
+                    width: 45,
+                    height: 45,
+                    borderRadius: 22.5,
+                    backgroundColor: COLORS.primary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Ionicons name={iconName} size={24} color={COLORS.white} />
+                </View>
+              ) : (
+                // Inactive tab: normal icon
+                <Ionicons name={iconName} size={24} color={COLORS.textGray} />
+              )}
+            </View>
+          );
         },
       })}
     >
@@ -182,7 +243,10 @@ function CustomSidebar(props: any) {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.logoutBtn}
-          onPress={() => console.log('Logging out...')}
+          onPress={() => {
+            console.log('Logging out...');
+            props.navigation.navigate('SplashScreen');
+          }}
         >
           <View style={styles.logoutIconWrapper}>
             <Text style={styles.powerIcon}>⏻</Text>
@@ -233,8 +297,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 0,
+    marginBottom: 0,
+    marginTop: -20,
     backgroundColor: COLORS.white,
-    paddingBottom: 10,
+    paddingBottom: 20,
   },
   locationContainer: { alignItems: 'center' },
   locationTitle: { fontSize: 12, color: COLORS.textGray },
@@ -265,7 +331,7 @@ const styles = StyleSheet.create({
     width: 85,
     height: 85,
     borderRadius: 42.5,
-    backgroundColor: '#FFCC00',
+    // backgroundColor: '#FFCC00',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -275,8 +341,8 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 15,
   },
-  avatarImage: { width: 75, height: 75, borderRadius: 37.5 },
-  userName: { fontSize: 20, fontWeight: 'bold', color: '#1A1A1A' },
+  avatarImage: { width: 85, height: 85, borderRadius: 37.5 },
+  userName: { fontSize: 20, fontWeight: "500", color: '#1A1A1A' },
   userHandle: { fontSize: 14, color: '#A0A0A0', marginTop: 4 },
 
   menuList: { marginTop: 10, paddingHorizontal: 15 },
@@ -288,5 +354,19 @@ const styles = StyleSheet.create({
   logoutBtn: { backgroundColor: '#FFC800', flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 15, borderRadius: 30, width: 150 },
   logoutIconWrapper: { backgroundColor: '#fff', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   powerIcon: { fontSize: 14, color: '#FFC800', fontWeight: 'bold' },
-  logoutText: { fontSize: 16, fontWeight: '700', color: '#000' },
+  logoutText: { fontSize: 16, fontWeight: '400', color: '#000' },
+   loadingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // semi-transparent overlay
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  
 });

@@ -3,6 +3,7 @@ import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+
 type ProfileScreenNavigationProp = NativeStackNavigationProp<any>;
 
 export default function ProfileScreen({ navigation }: { navigation: ProfileScreenNavigationProp }) {
