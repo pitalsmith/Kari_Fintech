@@ -8,26 +8,33 @@ import {
   TouchableOpacity, RefreshControl,ActivityIndicator, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { rootNavigationRef } from '../../../../App';
-
 import ProfileScreen from 'ProfileScreen';
+import CustomSidebar from '@/shared/components/navigation/sidebar_drawer';
+import LocationIcon from '@assets/icons/location.svg';
+import EditIcon from '@assets/icons/Edit.svg';
+import HamburgerIcon from '@assets/icons/Hamburger.svg';
+import TransferIcon from '@assets/icons/transfer.svg';
+import TopUpIcon from '@assets/icons/topup.svg';
+import HistoryIcon from '@assets/icons/history.svg';
 
 /* ---------- NAVIGATORS ---------- */
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
 /* ---------- COLORS ---------- */
-const COLORS = {
-  primary: '#FFCC00',
-  white: '#FFFFFF',
-  textDark: '#1A1A1A',
-  textGray: '#7D7D7D',
-  cardGray: '#F2F2F2',
-};
+import { COLORS } from '@/shared/constants/Color';
+// const COLORS = {
+//   primary: '#FFCC00',
+//   white: '#FFFFFF',
+//   textDark: '#1A1A1A',
+//   textGray: '#7D7D7D',
+//   cardGray: '#F2F2F2',
+// };
 
 /* ---------- HEADER ---------- */
 function AppHeader({ navigation }: any) {
@@ -36,21 +43,37 @@ function AppHeader({ navigation }: any) {
       <View style={styles.header}>
         {/* Hamburger menu */}
         <TouchableOpacity onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu-outline" size={28} />
+          {/* <Ionicons name="menu-outline" size={28} /> */}
+          <HamburgerIcon 
+              width={16} 
+              height={16} 
+              fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
+      />
         </TouchableOpacity>
 
         <View style={styles.locationContainer}>
           <Text style={styles.locationTitle}>My Location</Text>
           <View style={styles.locationAddress}>
-            <Ionicons name="location-sharp" size={16} color="#E57373" />
+            {/* <Ionicons name="location-sharp" size={16} color="#E57373" /> */}
+            <LocationIcon 
+              width={25} 
+              height={25} 
+              fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
+      />
             <Text style={styles.addressText}>10, Anifowose Str, Ikeja</Text>
+             <EditIcon 
+              width={20} 
+              height={20} 
+              fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
+      />
           </View>
         </View>
-
+        <View style={styles.avatarGlowMain}>
         <Image
           source={require('../../../../assets/image2.jpg')}
           style={styles.profilePic}
         />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -109,17 +132,30 @@ function HomeScreen({ navigation }: any) {
         
       <View style={styles.actionCard}>
         <TouchableOpacity style={styles.actionItem} onPress={handleTransferPress}>
-          <MaterialCommunityIcons name="swap-horizontal" size={24} />
+          {/* <MaterialCommunityIcons name="swap-horizontal" size={30} /> */}
+          <TransferIcon
+            width={30} 
+            height={30} 
+            // fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
+          />
           <Text style={styles.actionLabel}>Transfer</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionItem}>
-          <MaterialCommunityIcons name="credit-card-plus" size={24} />
+          <TopUpIcon
+            width={30} 
+            height={30} 
+            // fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
+          />
           <Text style={styles.actionLabel}>Top Up</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionItem}>
-          <MaterialCommunityIcons name="history" size={24} />
+          <HistoryIcon
+            width={30} 
+            height={30} 
+            // fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
+          />
           <Text style={styles.actionLabel}>History</Text>
         </TouchableOpacity>
       </View>
@@ -179,7 +215,7 @@ function MainTabs() {
                     alignItems: 'center',
                   }}
                 >
-                  <Ionicons name={iconName} size={24} color={COLORS.white} />
+                  <Ionicons name={iconName} size={24} color={COLORS.textBlack} />
                 </View>
               ) : (
                 // Inactive tab: normal icon
@@ -199,9 +235,9 @@ function MainTabs() {
   );
 }
 
-/* ---------- SIDE BAR CUSTOM DRAWER ---------- */
-function CustomSidebar(props: any) {
-  const menuItems = [
+
+// /* ----------SIDE BAR PROPS DRAWER ---------- */
+const passengerMenu =  [
     { label: 'Wallet', icon: '💳', screen: 'Wallet' },
     { label: 'My Profile', icon: '👤', screen: 'Profile' },
     { label: 'Ride History', icon: '📍', screen: 'RideHistory' },
@@ -211,52 +247,66 @@ function CustomSidebar(props: any) {
     { label: 'Help & Support', icon: '❓', screen: 'Help' },
   ];
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.profileSection}>
-          <View style={styles.avatarGlow}>
-            <Image
-          source={require('../../../../assets/image2.jpg')}
-          style={styles.profilePic2}
-          resizeMode="cover" // 👈 makes the image fully cover the container
-        />
-          </View>
-          <Text style={styles.userName}>Ogoluwa Ojewale</Text>
-          <Text style={styles.userHandle}>@ogopedia</Text>
-        </View>
+// /* ---------- SIDE BAR CUSTOM DRAWER ---------- */
+// function CustomSidebar(props: any) {
+//   const menuItems = [
+//     { label: 'Wallet', icon: '💳', screen: 'Wallet' },
+//     { label: 'My Profile', icon: '👤', screen: 'Profile' },
+//     { label: 'Ride History', icon: '📍', screen: 'RideHistory' },
+//     { label: 'Transactions', icon: '📄', screen: 'Transactions' },
+//     { label: 'Saved Items', icon: '❤️', screen: 'SavedItems' },
+//     { label: 'Settings', icon: '⚙️', screen: 'Settings' },
+//     { label: 'Help & Support', icon: '❓', screen: 'Help' },
+//   ];
 
-        <View style={styles.menuList}>
-          {menuItems.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.menuItem}
-              onPress={() => props.navigation.navigate(item.screen)}
-            >
-              <Text style={styles.menuIcon}>{item.icon}</Text>
-              <Text style={styles.menuLabel}>{item.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </DrawerContentScrollView>
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollContainer}>
+//         <View style={styles.profileSection}>
+//           <View style={styles.avatarGlow}>
+//             <Image
+//           source={require('../../../../assets/image2.jpg')}
+//           style={styles.profilePic2}
+//           resizeMode="cover" // 👈 makes the image fully cover the container
+//         />
+//           </View>
+//           <Text style={styles.userName}>Ogoluwa Ojewale</Text>
+//           <Text style={styles.userHandle}>@ogopedia</Text>
+//         </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.logoutBtn}
-          onPress={() => {
-            console.log('Logging out...');
-            props.navigation.navigate('SplashScreen');
-          }}
-        >
-          <View style={styles.logoutIconWrapper}>
-            <Text style={styles.powerIcon}>⏻</Text>
-          </View>
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-}
+//         <View style={styles.menuList}>
+//           {menuItems.map((item, index) => (
+//             <TouchableOpacity
+//               key={index}
+//               style={styles.menuItem}
+//               onPress={() => props.navigation.navigate(item.screen)}
+//             >
+//               <Text style={styles.menuIcon}>{item.icon}</Text>
+//               <Text style={styles.menuLabel}>{item.label}</Text>
+//             </TouchableOpacity>
+//           ))}
+//         </View>
+//       </DrawerContentScrollView>
+
+//       <View style={styles.footer}>
+//         <TouchableOpacity
+//           style={styles.logoutBtn}
+//           onPress={() => {
+//             console.log('Logging out...');
+//             props.navigation.navigate('SplashScreen');
+//           }}
+//         >
+//           <View style={styles.logoutIconWrapper}>
+//             <Text style={styles.powerIcon}>⏻</Text>
+//           </View>
+//           <Text style={styles.logoutText}>Log Out</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </SafeAreaView>
+//   );
+// }
+
+
 
 /* ---------- DRAWER WRAPPER ---------- */
 function AppLayout({ navigation }: any) {
@@ -280,7 +330,7 @@ export default function App() {
           borderBottomRightRadius: 40,
           backgroundColor: '#fff',
         }}
-        drawerContent={(props) => <CustomSidebar {...props} />}
+        drawerContent={(props) => <CustomSidebar {...props} menuItems={passengerMenu} />}
       >
         <Drawer.Screen name="AppLayout" component={AppLayout} />
       </Drawer.Navigator>
@@ -302,22 +352,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     paddingBottom: 20,
   },
-  locationContainer: { alignItems: 'center' },
-  locationTitle: { fontSize: 12, color: COLORS.textGray },
+  locationContainer: { alignItems: 'center', justifyContent: 'center' },
+  locationTitle: { fontSize: 16, color: COLORS.textDark, fontFamily: 'Sofia-Medium' },
   locationAddress: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
-  addressText: { fontSize: 14, fontWeight: 'bold', marginHorizontal: 4 },
+  addressText: { fontSize: 16, fontFamily: 'Sofia-Medium',  marginVertical: 3, marginHorizontal: 4, color: COLORS.textRed },
   profilePic: { width: 40, height: 40, borderRadius: 10, backgroundColor: COLORS.primary },
   profilePic2: { width: 75, height: 75, borderRadius: 37.5, backgroundColor: COLORS.primary },
   
 
   welcomeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 25 },
-  greetingText: { fontSize: 20, fontWeight: 'bold' },
-  subGreeting: { fontSize: 13, color: COLORS.textGray },
-  balanceText: { fontSize: 24, fontWeight: 'bold' },
+  greetingText: { fontSize: 18, fontFamily: 'Sofia-Medium', lineHeight: 21.6 , letterSpacing:0, color: COLORS.textBlack},
+  subGreeting: { fontSize: 16, color: COLORS.textGray , fontFamily: 'Sofia-Medium', lineHeight: 19.2, letterSpacing:0,},
+  balanceText: { fontSize: 28, fontFamily: 'Sofia-Medium', lineHeight: 33.6},
 
-  actionCard: { flexDirection: 'row', backgroundColor: COLORS.primary, borderRadius: 20, marginTop: 20, paddingVertical: 15 },
+  actionCard: { flexDirection: 'row', backgroundColor: COLORS.primary, borderRadius: 20, marginTop: 20, paddingVertical: 19 },
   actionItem: { flex: 1, alignItems: 'center' },
-  actionLabel: { fontSize: 13, fontWeight: '600', marginTop: 5 },
+  actionLabel: { fontSize: 13, fontWeight: '600', marginTop: 10 },
 
   promoCard: { height: 200, backgroundColor: COLORS.cardGray, borderRadius: 20, marginTop: 20, justifyContent: 'center', alignItems: 'center' },
   promoText: { fontSize: 18, fontWeight: 'bold', color: COLORS.textDark },
@@ -335,9 +385,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
-    shadowColor: '#FFCC00',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 15,
+  },
+    avatarGlowMain: {
+    // width: 85,
+    // height: 85,
+    borderRadius: 42.5,
+    // backgroundColor: '#FFCC00',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 0,
+    shadowColor: '#FFCC00',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.8,
     shadowRadius: 12,
     elevation: 15,
   },

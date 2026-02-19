@@ -1,23 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer,createNavigationContainerRef, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer,createNavigationContainerRef, } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ProfileScreen from './src/shared/components/ProfileScreen';
 import MainApp_HomeScreen from './src/apps/KariMain/screens/home';
-import Splash_Screen from './src/apps/KariMain/screens/splashscreen';
+import SplashScreen from './src/apps/KariMain/screens/splashscreen';
 import OnboardingScreen from './src/apps/KariMain/screens/onboardingscreen';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-SplashScreen.preventAutoHideAsync().catch(() => {
-  /* reloading the app might trigger an error here, which is fine to ignore */
-});
 
 type RootStackParamList = {
   Home: undefined;
   Profile: undefined;
   Main: undefined;
-  Splash_Screen: undefined;
+  SplashScreen: undefined;
   OnboardingScreen: undefined;
 };
 
@@ -39,7 +34,7 @@ function HomeScreen({ navigation }: HomeScreenProps) {
       <TouchableOpacity 
         style={styles.button}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('Splash_Screen')}
+        onPress={() => navigation.navigate('SplashScreen')}
       >
         <Text style={styles.buttonText}>Go to Main App Home</Text>
       </TouchableOpacity>
@@ -51,45 +46,14 @@ function HomeScreen({ navigation }: HomeScreenProps) {
 export const rootNavigationRef = createNavigationContainerRef();
 
 export default function App() {
-const [fontsLoaded, error] = useFonts({
-    'Gilroy-Bold': require('./assets/fonts/gilroy-Bold.ttf'),
-    'Sofia-Regular': require('./assets/fonts/sofia-pro-regular.otf'),
-    'Sofia-Medium': require('./assets/fonts/sofia-pro-medium.otf'),
-    'Sofia-Bold': require('./assets/fonts/sofia-pro-bold.otf'),
-    'Sofia-Semi-Bold': require('./assets/fonts/sofia-pro-bold.otf'),
-  });
-
-  useEffect(() => {
-    if (fontsLoaded || error) SplashScreen.hideAsync();
-  }, [fontsLoaded, error]);
-
-  const AppTheme = {
-    ...DefaultTheme,
-    // Mapping fonts to the standard navigation system
-    fonts: {
-      regular: { fontFamily: 'Sofia-Regular', fontWeight: '400' },
-      medium: { fontFamily: 'Sofia-Medium', fontWeight: '400' },
-      bold: { fontFamily: 'Gilroy-Bold', fontWeight: '700' },
-      heavy: { fontFamily: 'Gilroy-Bold', fontWeight: '800' },
-      sofiaBold: { fontFamily: 'Sofia-Bold', fontWeight: '700' },
-      sofiaSemiBold: { fontFamily: 'Sofia-Semi-Bold', fontWeight: '700' },
-      sofiaBoldd: { fontFamily: 'Sofia-S-Bold', fontWeight: '500' },
-    },
-  };
-
-  if (!fontsLoaded && !error) return null;
-
-
-
-
   return (
     <SafeAreaProvider>
-      <NavigationContainer theme={AppTheme}>
+      <NavigationContainer >
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Main" component={MainApp_HomeScreen} />
-          <Stack.Screen name="Splash_Screen" component={Splash_Screen} /> 
+          <Stack.Screen name="SplashScreen" component={SplashScreen} /> 
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         </Stack.Navigator>
       </NavigationContainer>

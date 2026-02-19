@@ -7,7 +7,6 @@ import {
   Image,
   TouchableOpacity,
   Animated,
-  ActivityIndicator, // ✅ Added
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -15,21 +14,21 @@ const { width } = Dimensions.get('window');
 const slides = [
   {
     id: '1',
-    // image: require('../../../../assets/OnboadingScreen1.png'),
+    image: require('../../../../assets/OnboadingScreen1.png'),
     backgroundImage: require('../../../../assets/OnboadingScreen1.jpg'),
     title: 'Get your Favourite Food!',
     desc: 'Exclusive coupons, specials and rewards',
   },
   {
     id: '2',
-    // image: require('../../../../assets/OnboardingScreen2.png'),
+    image: require('../../../../assets/OnboardingScreen2.png'),
     backgroundImage: require('../../../../assets/OnboardingScreen2up.jpg'),
     title: 'Get or Share a Ride',
     desc: 'Receive delivery credits for every order',
   },
   {
     id: '3',
-    // image: require('../../../../assets/OnboardingScreen3.png'),
+    image: require('../../../../assets/OnboardingScreen3.png'),
     backgroundImage: require('../../../../assets/OnboardingScreen3up.jpg'),
     title: 'Fast Delivery to your home',
     desc: 'Simple and fast ordering system',
@@ -40,9 +39,6 @@ export default function OnboardingScreen({ navigation }: any) {
   const flatListRef = useRef<any>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const [loadedCount, setLoadedCount] = useState(0); // ✅ Track loaded images
-  const allLoaded = loadedCount === slides.length;   // ✅ Check if all loaded
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
@@ -66,7 +62,7 @@ export default function OnboardingScreen({ navigation }: any) {
       {/* 🔥 Animated Backgrounds */}
       <View
         style={StyleSheet.absoluteFillObject}
-        pointerEvents="none"
+        pointerEvents="none" // IMPORTANT: allows scrolling
       >
         {slides.map((slide, index) => {
           const opacity = scrollX.interpolate({
@@ -83,16 +79,15 @@ export default function OnboardingScreen({ navigation }: any) {
             <Animated.Image
               key={slide.id}
               source={slide.backgroundImage}
-              onLoad={() => setLoadedCount((prev) => prev + 1)} // ✅ Count loads
-              style={[
-                {
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  opacity,
-                },
-              ]}
-              resizeMode="cover"
+             style={[
+                  {
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    opacity,
+                  },
+                ]}
+                resizeMode="cover"
             />
           );
         })}
@@ -145,13 +140,6 @@ export default function OnboardingScreen({ navigation }: any) {
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* ✅ Loading Overlay */}
-      {!allLoaded && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#C2543C" />
-        </View>
-      )}
     </View>
   );
 }
@@ -165,7 +153,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 30,
-    paddingBottom: 0, // ✅ Added padding for buttons
   },
   image: {
     width: width * 0.8,
@@ -178,7 +165,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#777',
     textAlign: 'center',
-    // paddingBottom: 10,
   },
   desc: {
     fontSize: 16,
@@ -188,7 +174,7 @@ const styles = StyleSheet.create({
   },
   dots: {
     position: 'absolute',
-    bottom: 180,
+    bottom: 150,
     flexDirection: 'row',
     alignSelf: 'center',
   },
@@ -217,29 +203,13 @@ const styles = StyleSheet.create({
     color: '#777',
   },
   nextBtn: {
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#C2543C',
-    width: 168,
-    height: 56,
-    
-    // paddingHorizontal: 40,
-    // paddingVertical: 14,
+    paddingHorizontal: 40,
+    paddingVertical: 14,
     borderRadius: 10,
   },
   nextText: {
-    alignItems: 'center',
-    justifyContent: 'center',
     color: '#fff',
     fontWeight: 'bold',
-  },
-
-  // ✅ Added Style
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#00000040',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

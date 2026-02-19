@@ -1,7 +1,8 @@
+
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, ImageBackground } from 'react-native';
 
-export default function SplashScreen({ navigation }: any) {
+export default function Splash_Screen({ navigation }: any) {
   useEffect(() => {
     setTimeout(() => {
       navigation.replace('Onboarding');
@@ -50,4 +51,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
 });
