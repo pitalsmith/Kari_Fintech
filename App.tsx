@@ -1,14 +1,27 @@
 import React, { useEffect } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer,createNavigationContainerRef, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer,createNavigationContainerRef, DefaultTheme, Theme, } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import ProfileScreen from './src/shared/components/ProfileScreen';
-import MainApp_HomeScreen from './src/apps/KariMain/screens/home';
-import Splash_Screen from './src/apps/KariMain/screens/splashscreen';
-import OnboardingScreen from './src/apps/KariMain/screens/onboardingscreen';
+import { LogBox } from 'react-native';
+import MainApp_HomeScreen from './src/apps/KariMainWallet/screens/home';
+import Splash_Screen from './src/apps/KariMainWallet/screens/splashscreen';
+import App_Entry from '@/apps/AppEntry';
+import OnboardingScreen from './src/apps/KariMainWallet/screens/onboardingscreen';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (args[0]?.includes && 
+      (args[0].includes('SafeAreaView') || 
+       args[0].includes('deprecated'))) {
+    return;
+  }
+  originalWarn(...args);
+};
+
+
 SplashScreen.preventAutoHideAsync().catch(() => {
   /* reloading the app might trigger an error here, which is fine to ignore */
 });
@@ -19,6 +32,7 @@ type RootStackParamList = {
   Main: undefined;
   Splash_Screen: undefined;
   OnboardingScreen: undefined;
+  App_Entry: undefined;
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
@@ -28,6 +42,7 @@ interface HomeScreenProps {
 }
 
 const Stack = createStackNavigator();
+
 
 // --- COMPONENTS ---
 
@@ -39,7 +54,7 @@ function HomeScreen({ navigation }: HomeScreenProps) {
       <TouchableOpacity 
         style={styles.button}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('Splash_Screen')}
+        onPress={() => navigation.navigate('App_Entry')}
       >
         <Text style={styles.buttonText}>Go to Main App Home</Text>
       </TouchableOpacity>
@@ -49,6 +64,18 @@ function HomeScreen({ navigation }: HomeScreenProps) {
 
 // --- MAIN APP ---
 export const rootNavigationRef = createNavigationContainerRef();
+
+type ExtendedTheme = Theme & {
+  fonts: Theme['fonts'] & {
+    sofiaBold: { fontFamily: string; fontWeight: string };
+    sofiaSemiBold: { fontFamily: string; fontWeight: string };
+    sofiaBoldd: { fontFamily: string; fontWeight: string };
+    regular: { fontFamily: 'Sofia-Regular', fontWeight: '400' },
+    medium: { fontFamily: 'Sofia-Medium', fontWeight: '400' },
+    bold: { fontFamily: 'Gilroy-Bold', fontWeight: '700' },
+    heavy: { fontFamily: 'Gilroy-Bold', fontWeight: '800' },
+  };
+};
 
 export default function App() {
 const [fontsLoaded, error] = useFonts({
@@ -63,18 +90,19 @@ const [fontsLoaded, error] = useFonts({
     if (fontsLoaded || error) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
-  const AppTheme = {
+  const AppTheme : ExtendedTheme = {
     ...DefaultTheme,
     // Mapping fonts to the standard navigation system
-    fonts: {
-      regular: { fontFamily: 'Sofia-Regular', fontWeight: '400' },
-      medium: { fontFamily: 'Sofia-Medium', fontWeight: '400' },
-      bold: { fontFamily: 'Gilroy-Bold', fontWeight: '700' },
-      heavy: { fontFamily: 'Gilroy-Bold', fontWeight: '800' },
-      sofiaBold: { fontFamily: 'Sofia-Bold', fontWeight: '700' },
-      sofiaSemiBold: { fontFamily: 'Sofia-Semi-Bold', fontWeight: '700' },
-      sofiaBoldd: { fontFamily: 'Sofia-S-Bold', fontWeight: '500' },
-    },
+  fonts: {
+    regular: { fontFamily: 'Sofia-Regular', fontWeight: '400' },
+    medium: { fontFamily: 'Sofia-Medium', fontWeight: '400' },
+    bold: { fontFamily: 'Gilroy-Bold', fontWeight: '700' },
+    heavy: { fontFamily: 'Gilroy-Bold', fontWeight: '800' },
+
+    sofiaBold: { fontFamily: 'Sofia-Bold', fontWeight: '700' },
+    sofiaSemiBold: { fontFamily: 'Sofia-Semi-Bold', fontWeight: '700' },
+    sofiaBoldd: { fontFamily: 'Sofia-S-Bold', fontWeight: '500' },
+  },
   };
 
   if (!fontsLoaded && !error) return null;
@@ -86,11 +114,12 @@ const [fontsLoaded, error] = useFonts({
     <SafeAreaProvider>
       <NavigationContainer theme={AppTheme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
+          {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
+          <Stack.Screen name="Home" component={App_Entry} />
           <Stack.Screen name="Main" component={MainApp_HomeScreen} />
           <Stack.Screen name="Splash_Screen" component={Splash_Screen} /> 
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="App_Entry" component={App_Entry} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
@@ -100,73 +129,10 @@ const [fontsLoaded, error] = useFonts({
 // --- STYLESHEET ---
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8fafc', // Same as slate-50
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#1e293b', // Deep slate color
-  },
-  button: {
-    backgroundColor: '#2563eb', // Same as blue-600
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    // Team tip: Shadow helps buttons pop
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3, // Required for Android shadows
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#1e293b' },
+  button: { backgroundColor: '#2563eb', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  buttonText: { color: '#ffffff', fontWeight: 'bold', fontSize: 16 },
 });
-
-
-
-// import "./global.css";
-// import React from 'react';
-// import { Text, View, TouchableOpacity } from 'react-native';
-// import { NavigationContainer } from '@react-navigation/native';
-// import { createStackNavigator } from '@react-navigation/stack';
-// import { SafeAreaProvider } from 'react-native-safe-area-context';
-// import ProfileScreen from './components/ProfileScreen';
-
-// const Stack = createStackNavigator();
-
-// function HomeScreen({ navigation }) {
-//   return (
-//     <View className="items-center justify-center flex-1 bg-slate-50">
-//       <Text className="mb-5 text-2xl font-bold">Home Screen</Text>
-//       <TouchableOpacity 
-//         className="px-6 py-3 bg-blue-600 rounded-xl"
-//         onPress={() => navigation.navigate('Profile')}
-//       >
-//         <Text className="font-bold text-white">Go to Profile</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// }
-
-// export default function App() {
-//   return (
-//     <SafeAreaProvider>
-//       <NavigationContainer>
-//         <Stack.Navigator screenOptions={{ headerShown: false }}>
-//           <Stack.Screen name="Home" component={HomeScreen} />
-//           <Stack.Screen name="Profile" component={ProfileScreen} />
-//         </Stack.Navigator>
-//       </NavigationContainer>
-//     </SafeAreaProvider>
-//   );
-// }
 

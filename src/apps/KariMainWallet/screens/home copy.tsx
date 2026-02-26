@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity, RefreshControl,ActivityIndicator, Modal,
+  ImageSourcePropType,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
@@ -13,7 +14,26 @@ import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigatio
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { rootNavigationRef } from '../../../../App';
-import ProfileScreen from 'ProfileScreen';
+
+// =======================================================
+//                         Screens
+// =======================================================
+// import ProfileScreen from 'ProfileScreen';
+import Location_Screen from './location_screen';
+import Cart_Screen from './cart_screen';
+import Wallet_Screen from './wallet_screen';
+import Notifications_Screen from './notifications_screen';
+
+// =======================================================
+//                         Components
+// =======================================================
+import KariPayHomeScreen from '../components/karipayhomescreen';
+import ActionCardWithLoader from '@/apps/KariMainWallet/components/actionCard';
+
+
+// =======================================================
+//                         Icons
+// =======================================================
 import CustomSidebar from '@/shared/components/navigation/sidebar_drawer';
 import LocationIcon from '@assets/icons/location.svg';
 import EditIcon from '@assets/icons/Edit.svg';
@@ -22,22 +42,44 @@ import TransferIcon from '@assets/icons/transfer.svg';
 import TopUpIcon from '@assets/icons/topup.svg';
 import HistoryIcon from '@assets/icons/history.svg';
 
+
+
 /* ---------- NAVIGATORS ---------- */
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
 /* ---------- COLORS ---------- */
 import { COLORS } from '@/shared/constants/Color';
-// const COLORS = {
-//   primary: '#FFCC00',
-//   white: '#FFFFFF',
-//   textDark: '#1A1A1A',
-//   textGray: '#7D7D7D',
-//   cardGray: '#F2F2F2',
-// };
+
+
+export interface UserData {
+  id: string;
+  firstname: string;
+  lastname: string;
+  location: string;
+  balance: number | string;
+  profileImage?: ImageSourcePropType; // Optional
+  currency: string;
+}
+
+
+export const userData: UserData = {
+  id: 'user_01',
+  firstname: 'Ogoluwa',
+  lastname: 'Ojewale',
+  location: '10, Anifowose Str, Ikeja',
+  balance: '₦15,903',
+  currency: 'USD',
+  profileImage: require('../../../../assets/image2.jpg'),
+};
+
+
+// console.log('User Data:', userData); 
 
 /* ---------- HEADER ---------- */
 function AppHeader({ navigation }: any) {
+const [loading, setLoading] = useState(false);
+
   return (
     <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
       <View style={styles.header}>
@@ -60,7 +102,7 @@ function AppHeader({ navigation }: any) {
               height={25} 
               fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
       />
-            <Text style={styles.addressText}>10, Anifowose Str, Ikeja</Text>
+            <Text style={styles.addressText}>{userData.location}</Text>
              <EditIcon 
               width={20} 
               height={20} 
@@ -68,12 +110,23 @@ function AppHeader({ navigation }: any) {
       />
           </View>
         </View>
-        <View style={styles.avatarGlowMain}>
-        <Image
-          source={require('../../../../assets/image2.jpg')}
-          style={styles.profilePic}
+       <View style={styles.avatarGlowMain}>
+      {/* 1. Show the indicator only when loading is true */}
+      {loading && (
+        <ActivityIndicator 
+          style={styles.loader} 
+          color="#E57373" // Or your brand color
+          size="small" 
         />
-        </View>
+      )}
+
+      <Image
+        source={userData.profileImage}
+        style={styles.profilePic}
+        onLoadStart={() => setLoading(true)}  // Starts the loader
+        onLoadEnd={() => setLoading(false)}   // Hides the loader
+      />
+    </View>
       </View>
     </SafeAreaView>
   );
@@ -90,7 +143,7 @@ function HomeScreen({ navigation }: any) {
     // Simulate a 2-second loading delay
     setTimeout(() => {
       setLoading(false);
-      navigation.getParent()?.navigate("Profile"); // Replace with your actual screen name
+      navigation.getParent()?.navigate("App_Entry"); // Replace with your actual screen name
     }, 2000);
   };
     
@@ -103,8 +156,30 @@ function HomeScreen({ navigation }: any) {
     }, 1500); // 1.5 seconds
   }, []);
 
+
+
+     const actions = [
+    {
+      Icon: TransferIcon,
+      label: "Transfer",
+      onPress: handleTransferPress,
+      width: 28,
+      height: 28,
+    },
+    {
+      Icon: TopUpIcon,
+      label: "Top Up",
+      onPress: () => console.log("Transfer Pressed"),
+    },
+    {
+      Icon: HistoryIcon,
+      label: "History",
+      onPress: () => console.log("Top Up Pressed"),
+    },
+  ];
+
   return (
-    <ScrollView
+    <ScrollView style={styles.MainContainer}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingHorizontal: 20 }}
       refreshControl={
@@ -122,66 +197,36 @@ function HomeScreen({ navigation }: any) {
       
       <View style={styles.welcomeRow}>
         <View>
-          <Text style={styles.greetingText}>Hi Ogoluwa,</Text>
+          <Text style={styles.greetingText}>Hi {userData.firstname},</Text>
           <Text style={styles.subGreeting}>Your available balance</Text>
         </View>
-        <Text style={styles.balanceText}>₦15,903</Text>
+        <Text style={styles.balanceText}>{userData.balance}</Text>
       </View>
 
 
-        
-      <View style={styles.actionCard}>
-        <TouchableOpacity style={styles.actionItem} onPress={handleTransferPress}>
-          {/* <MaterialCommunityIcons name="swap-horizontal" size={30} /> */}
-          <TransferIcon
-            width={30} 
-            height={30} 
-            // fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
-          />
-          <Text style={styles.actionLabel}>Transfer</Text>
-        </TouchableOpacity>
+      
 
-        <TouchableOpacity style={styles.actionItem}>
-          <TopUpIcon
-            width={30} 
-            height={30} 
-            // fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
-          />
-          <Text style={styles.actionLabel}>Top Up</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionItem}>
-          <HistoryIcon
-            width={30} 
-            height={30} 
-            // fill="#E57373" // This replaces the 'color' prop if the SVG is coded for it
-          />
-          <Text style={styles.actionLabel}>History</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.promoCard}>
-        <Text style={styles.promoText}>Promotional Banner</Text>
-      </View>
+       <ActionCardWithLoader loading={loading} actions={actions} />
+      
+      {/* ================= Home Screen Content ===================== */}
+      <KariPayHomeScreen/>
 
       <View style={{ height: 40 }} />
     </ScrollView>
   );
 }
 
-/* ---------- OTHER SCREENS ---------- */
-function CenterScreen({ title }: { title: string }) {
-  return (
-    <View style={styles.centerScreen}>
-      <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{title}</Text>
-    </View>
-  );
-}
 
-const WalletScreen = () => <CenterScreen title="Wallet Screen" />;
-const LocationScreen = () => <CenterScreen title="Location Screen" />;
-const CartScreen = () => <CenterScreen title="Cart Screen" />;
-const NotificationsScreen = () => <CenterScreen title="Notifications Screen" />;
+
+
+// ================================================
+//                      Other Screens
+// ================================================
+
+const WalletScreen = () => <Wallet_Screen/>;
+const LocationScreen = () => <Location_Screen />;
+const CartScreen = () => <Cart_Screen />;
+const NotificationsScreen = () => <Notifications_Screen />;
 
 /* ---------- BOTTOM TABS ---------- */
 function MainTabs() {
@@ -247,64 +292,7 @@ const passengerMenu =  [
     { label: 'Help & Support', icon: '❓', screen: 'Help' },
   ];
 
-// /* ---------- SIDE BAR CUSTOM DRAWER ---------- */
-// function CustomSidebar(props: any) {
-//   const menuItems = [
-//     { label: 'Wallet', icon: '💳', screen: 'Wallet' },
-//     { label: 'My Profile', icon: '👤', screen: 'Profile' },
-//     { label: 'Ride History', icon: '📍', screen: 'RideHistory' },
-//     { label: 'Transactions', icon: '📄', screen: 'Transactions' },
-//     { label: 'Saved Items', icon: '❤️', screen: 'SavedItems' },
-//     { label: 'Settings', icon: '⚙️', screen: 'Settings' },
-//     { label: 'Help & Support', icon: '❓', screen: 'Help' },
-//   ];
 
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollContainer}>
-//         <View style={styles.profileSection}>
-//           <View style={styles.avatarGlow}>
-//             <Image
-//           source={require('../../../../assets/image2.jpg')}
-//           style={styles.profilePic2}
-//           resizeMode="cover" // 👈 makes the image fully cover the container
-//         />
-//           </View>
-//           <Text style={styles.userName}>Ogoluwa Ojewale</Text>
-//           <Text style={styles.userHandle}>@ogopedia</Text>
-//         </View>
-
-//         <View style={styles.menuList}>
-//           {menuItems.map((item, index) => (
-//             <TouchableOpacity
-//               key={index}
-//               style={styles.menuItem}
-//               onPress={() => props.navigation.navigate(item.screen)}
-//             >
-//               <Text style={styles.menuIcon}>{item.icon}</Text>
-//               <Text style={styles.menuLabel}>{item.label}</Text>
-//             </TouchableOpacity>
-//           ))}
-//         </View>
-//       </DrawerContentScrollView>
-
-//       <View style={styles.footer}>
-//         <TouchableOpacity
-//           style={styles.logoutBtn}
-//           onPress={() => {
-//             console.log('Logging out...');
-//             props.navigation.navigate('SplashScreen');
-//           }}
-//         >
-//           <View style={styles.logoutIconWrapper}>
-//             <Text style={styles.powerIcon}>⏻</Text>
-//           </View>
-//           <Text style={styles.logoutText}>Log Out</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
 
 
 
@@ -321,19 +309,34 @@ function AppLayout({ navigation }: any) {
 /* ---------- ROOT ---------- */
 export default function App() {
   return (
-
-      <Drawer.Navigator
-        screenOptions={{ headerShown: false }}
-        drawerStyle={{
+    
+        <Drawer.Navigator
+      screenOptions={{ 
+        headerShown: false,
+        drawerStyle: {
           width: '75%',
           borderTopRightRadius: 40,
           borderBottomRightRadius: 40,
           backgroundColor: '#fff',
-        }}
-        drawerContent={(props) => <CustomSidebar {...props} menuItems={passengerMenu} />}
-      >
-        <Drawer.Screen name="AppLayout" component={AppLayout} />
-      </Drawer.Navigator>
+        }
+      }}
+      drawerContent={(props) => <CustomSidebar {...props} menuItems={passengerMenu} />}
+    >
+      <Drawer.Screen name="AppLayout" component={AppLayout} />
+    </Drawer.Navigator>
+
+      // <Drawer.Navigator
+      //   screenOptions={{ headerShown: false }}
+      //   drawerStyle={{
+      //     width: '75%',
+      //     borderTopRightRadius: 40,
+      //     borderBottomRightRadius: 40,
+      //     backgroundColor: '#fff',
+      //   }}
+      //   drawerContent={(props) => <CustomSidebar {...props} menuItems={passengerMenu} />}
+      // >
+      //   <Drawer.Screen name="AppLayout" component={AppLayout} />
+      // </Drawer.Navigator>
    
   );
 }
@@ -359,7 +362,7 @@ const styles = StyleSheet.create({
   profilePic: { width: 40, height: 40, borderRadius: 10, backgroundColor: COLORS.primary },
   profilePic2: { width: 75, height: 75, borderRadius: 37.5, backgroundColor: COLORS.primary },
   
-
+  MainContainer: { backgroundColor: COLORS.white, },
   welcomeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 25 },
   greetingText: { fontSize: 18, fontFamily: 'Sofia-Medium', lineHeight: 21.6 , letterSpacing:0, color: COLORS.textBlack},
   subGreeting: { fontSize: 16, color: COLORS.textGray , fontFamily: 'Sofia-Medium', lineHeight: 19.2, letterSpacing:0,},
@@ -430,6 +433,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  loader: {
+    position: 'absolute',
+    zIndex: 1, // Ensures it stays on top of the image
   },
 
   

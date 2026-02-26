@@ -4,9 +4,9 @@ import { NavigationContainer,createNavigationContainerRef, } from '@react-naviga
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ProfileScreen from './src/shared/components/ProfileScreen';
-import MainApp_HomeScreen from './src/apps/KariMain/screens/home';
-import SplashScreen from './src/apps/KariMain/screens/splashscreen';
-import OnboardingScreen from './src/apps/KariMain/screens/onboardingscreen';
+import MainApp_HomeScreen from './src/apps/KariMainWallet/screens/home';
+import SplashScreen from './src/apps/KariMainWallet/screens/splashscreen';
+import OnboardingScreen from './src/apps/KariMainWallet/screens/onboardingscreen';
 
 type RootStackParamList = {
   Home: undefined;

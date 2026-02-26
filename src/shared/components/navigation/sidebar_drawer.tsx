@@ -66,7 +66,7 @@ function CustomSidebar(props: any) {
           style={styles.logoutBtn}
           onPress={() => {
             console.log('Logging out...');
-            props.navigation.navigate('Splash_Screen');
+            props.navigation.navigate('App_Entry');
           }}
         >
           <View style={styles.logoutIconWrapper}>
